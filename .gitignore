@@ -1,0 +1,38 @@
+# Android build
+*.iml
+.gradle
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Android Studio / IDE
+/.idea/
+*.iml
+
+# SDK config
+local.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+
+# Secrets & credentials
+*.jks
+*.keystore
+*.key
+*.pem
+*.p12
+*.env
+.env.*
+credentials.json
+google-services.json
+service-account*.json
+
+# Signing config
+signing.properties
+keystore.properties
