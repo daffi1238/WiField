@@ -36,3 +36,4 @@ service-account*.json
 # Signing config
 signing.properties
 keystore.properties
+wifield-release.jks

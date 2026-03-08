@@ -36,6 +36,7 @@ data class ActiveDiagUiState(
     val speedTestProgress: Int = 0,
     val currentSpeed: Double = 0.0,
     val isRunningPing: Boolean = false,
+    val pingProgress: String = "",
     val rssiHistory: List<Int> = emptyList(),
     val latencyHistory: List<Double> = emptyList(),
     val monitoring: Boolean = false,
@@ -107,26 +108,50 @@ class ActiveDiagnosticViewModel(application: Application) : AndroidViewModel(app
 
     fun runPingTest() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRunningPing = true)
+            _uiState.value = _uiState.value.copy(isRunningPing = true, pingProgress = "Gateway...")
 
-            // Ping gateway
+            // Ping gateway with progress
             val gatewayIp = getGatewayIp()
-            val gatewayResult = if (gatewayIp != null) {
-                PingService.pingGateway(gatewayIp)
-            } else null
+            var gatewayLatency = 0.0
+            if (gatewayIp != null) {
+                PingService.pingWithProgress(gatewayIp, count = 10).collect { progress ->
+                    gatewayLatency = progress.averageLatency
+                    _uiState.value = _uiState.value.copy(
+                        pingProgress = "Gateway: ${progress.sent}/10 (${String.format("%.0f", progress.averageLatency)} ms)"
+                    )
+                }
+            }
 
-            // Ping external
-            val externalResult = PingService.pingExternal()
+            // Ping external with progress
+            _uiState.value = _uiState.value.copy(pingProgress = "Internet...")
+            var extLatency = 0.0
+            var extJitter = 0.0
+            var extPacketLoss = 0.0
+            PingService.pingWithProgress("8.8.8.8", count = 20).collect { progress ->
+                extLatency = progress.averageLatency
+                _uiState.value = _uiState.value.copy(
+                    pingProgress = "Internet: ${progress.sent}/20 (${String.format("%.0f", progress.averageLatency)} ms)"
+                )
+            }
+
+            // Get final stats from a quick dedicated measurement
+            val externalResult = PingService.ping("8.8.8.8", count = 5, timeoutMs = 2000)
+            if (externalResult.latency > 0) {
+                extLatency = externalResult.latency
+                extJitter = externalResult.jitter
+                extPacketLoss = externalResult.packetLoss
+            }
 
             val connInfo = wifiScanner.getConnectionInfo()
 
             _uiState.value = _uiState.value.copy(
                 isRunningPing = false,
+                pingProgress = "",
                 testResults = _uiState.value.testResults.copy(
-                    latency = externalResult.latency,
-                    jitter = externalResult.jitter,
-                    packetLoss = externalResult.packetLoss,
-                    gatewayLatency = gatewayResult?.latency ?: 0.0,
+                    latency = extLatency,
+                    jitter = extJitter,
+                    packetLoss = extPacketLoss,
+                    gatewayLatency = gatewayLatency,
                     linkSpeed = connInfo?.linkSpeed ?: 0
                 )
             )

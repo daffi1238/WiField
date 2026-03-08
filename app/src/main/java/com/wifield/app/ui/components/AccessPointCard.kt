@@ -45,14 +45,14 @@ fun AccessPointCard(
                     if (ap.isConnected) {
                         Icon(
                             imageVector = Icons.Default.Link,
-                            contentDescription = "Conectado",
+                            contentDescription = "Connected",
                             tint = SignalExcellent,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }
                     Text(
-                        text = ap.ssid.ifEmpty { "(Oculto)" },
+                        text = ap.ssid.ifEmpty { "(Hidden)" },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1
@@ -86,7 +86,7 @@ fun AccessPointCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = if (ap.security == "Open") Icons.Default.LockOpen else Icons.Default.Lock,
-                        contentDescription = "Seguridad",
+                        contentDescription = "Security",
                         modifier = Modifier.size(14.dp),
                         tint = if (ap.security == "Open" || ap.security == "WEP") SignalCritical
                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)

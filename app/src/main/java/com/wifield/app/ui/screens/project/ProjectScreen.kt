@@ -44,7 +44,7 @@ fun ProjectScreen(
                 title = {
                     Column {
                         Text(
-                            text = uiState.project?.name ?: "Proyecto",
+                            text = uiState.project?.name ?: "Project",
                             fontWeight = FontWeight.Bold
                         )
                         uiState.project?.description?.takeIf { it.isNotBlank() }?.let {
@@ -58,13 +58,13 @@ fun ProjectScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     if (uiState.snapshots.size >= 2) {
                         IconButton(onClick = { onComparatorClick(projectId) }) {
-                            Icon(Icons.Default.SwapHoriz, contentDescription = "Comparar")
+                            Icon(Icons.Default.SwapHoriz, contentDescription = "Compare")
                         }
                     }
                 },
@@ -95,7 +95,7 @@ fun ProjectScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Resumen del proyecto",
+                                text = "Project summary",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold
                             )
@@ -123,7 +123,7 @@ fun ProjectScreen(
                                         } else com.wifield.app.ui.theme.AlertWarning
                                     )
                                     Text(
-                                        "Alertas",
+                                        "Alerts",
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
@@ -152,11 +152,11 @@ fun ProjectScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "No hay snapshots",
+                                    "No snapshots",
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
                                 Text(
-                                    "Usa el Scanner o Diagnóstico para crear snapshots",
+                                    "Use Scanner or Diagnostic to create snapshots",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                                 )
@@ -166,7 +166,7 @@ fun ProjectScreen(
                 } else {
                     item {
                         Text(
-                            text = "Ubicaciones",
+                            text = "Locations",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -224,7 +224,7 @@ private fun SnapshotSummaryCard(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Eliminar",
+                            contentDescription = "Delete",
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         )
@@ -233,7 +233,7 @@ private fun SnapshotSummaryCard(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InfoChip(
-                        label = if (summary.snapshot.isActiveMode) "Activo" else "Pasivo",
+                        label = if (summary.snapshot.isActiveMode) "Active" else "Passive",
                         color = if (summary.snapshot.isActiveMode) {
                             com.wifield.app.ui.theme.SignalGood
                         } else MaterialTheme.colorScheme.secondary
@@ -267,8 +267,8 @@ private fun SnapshotSummaryCard(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Eliminar snapshot") },
-            text = { Text("¿Eliminar '${summary.snapshot.label}'?") },
+            title = { Text("Delete snapshot") },
+            text = { Text("Delete '${summary.snapshot.label}'?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -276,10 +276,10 @@ private fun SnapshotSummaryCard(
                         onDelete()
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text("Eliminar") }
+                ) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancel") }
             }
         )
     }

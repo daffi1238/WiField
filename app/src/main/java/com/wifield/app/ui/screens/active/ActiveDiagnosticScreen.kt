@@ -37,7 +37,7 @@ fun ActiveDiagnosticScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Diagnóstico Activo", fontWeight = FontWeight.Bold)
+                        Text("Active Diagnostic", fontWeight = FontWeight.Bold)
                         if (uiState.connectionInfo != null) {
                             Text(
                                 text = uiState.connectionInfo!!.ssid,
@@ -49,7 +49,7 @@ fun ActiveDiagnosticScreen(
                 },
                 actions = {
                     IconButton(onClick = { viewModel.refreshConnection() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Actualizar")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -80,19 +80,19 @@ fun ActiveDiagnosticScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "No conectado a WiFi",
+                        "Not connected to WiFi",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "Conéctese a una red WiFi para usar el diagnóstico activo",
+                        "Connect to a WiFi network to use active diagnostic",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { viewModel.refreshConnection() }) {
-                        Text("Reintentar")
+                        Text("Retry")
                     }
                 }
             }
@@ -102,7 +102,7 @@ fun ActiveDiagnosticScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Signal gauge
@@ -142,7 +142,7 @@ fun ActiveDiagnosticScreen(
                                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text(if (uiState.isRunningSpeedTest) "Midiendo..." else "Iniciar")
+                                Text(if (uiState.isRunningSpeedTest) "Measuring..." else "Start")
                             }
                         }
 
@@ -154,8 +154,8 @@ fun ActiveDiagnosticScreen(
                             )
                             Text(
                                 text = when (uiState.speedTestPhase) {
-                                    SpeedTestPhase.DOWNLOAD -> "Descarga: ${String.format("%.1f", uiState.currentSpeed)} Mbps"
-                                    SpeedTestPhase.UPLOAD -> "Subida: ${String.format("%.1f", uiState.currentSpeed)} Mbps"
+                                    SpeedTestPhase.DOWNLOAD -> "Download: ${String.format("%.1f", uiState.currentSpeed)} Mbps"
+                                    SpeedTestPhase.UPLOAD -> "Upload: ${String.format("%.1f", uiState.currentSpeed)} Mbps"
                                     else -> ""
                                 },
                                 style = MaterialTheme.typography.bodySmall
@@ -168,13 +168,13 @@ fun ActiveDiagnosticScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             SpeedMetric(
-                                label = "Descarga",
+                                label = "Download",
                                 value = "${String.format("%.1f", uiState.testResults.downloadSpeed)} Mbps",
                                 icon = Icons.Default.ArrowDownward,
                                 color = SignalGood
                             )
                             SpeedMetric(
-                                label = "Subida",
+                                label = "Upload",
                                 value = "${String.format("%.1f", uiState.testResults.uploadSpeed)} Mbps",
                                 icon = Icons.Default.ArrowUpward,
                                 color = SignalExcellent
@@ -191,7 +191,7 @@ fun ActiveDiagnosticScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Latencia", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("Latency", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                             Button(
                                 onClick = { viewModel.runPingTest() },
                                 enabled = !uiState.isRunningPing
@@ -200,8 +200,17 @@ fun ActiveDiagnosticScreen(
                                     CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                                     Spacer(modifier = Modifier.width(8.dp))
                                 }
-                                Text(if (uiState.isRunningPing) "Midiendo..." else "Ping")
+                                Text(if (uiState.isRunningPing) "Measuring..." else "Ping (20x)")
                             }
+                        }
+
+                        if (uiState.isRunningPing && uiState.pingProgress.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                            Text(
+                                text = uiState.pingProgress,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -209,9 +218,9 @@ fun ActiveDiagnosticScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            PingMetric("Latencia", "${String.format("%.1f", uiState.testResults.latency)} ms")
+                            PingMetric("Latency", "${String.format("%.1f", uiState.testResults.latency)} ms")
                             PingMetric("Jitter", "${String.format("%.1f", uiState.testResults.jitter)} ms")
-                            PingMetric("Pérdida", "${String.format("%.1f", uiState.testResults.packetLoss)}%")
+                            PingMetric("Loss", "${String.format("%.1f", uiState.testResults.packetLoss)}%")
                             PingMetric("Gateway", "${String.format("%.1f", uiState.testResults.gatewayLatency)} ms")
                         }
                     }
@@ -225,7 +234,7 @@ fun ActiveDiagnosticScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Monitorización", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("Monitoring", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                             Button(onClick = { viewModel.toggleMonitoring() }) {
                                 Icon(
                                     imageVector = if (uiState.monitoring) Icons.Default.Stop else Icons.Default.PlayArrow,
@@ -233,7 +242,7 @@ fun ActiveDiagnosticScreen(
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(if (uiState.monitoring) "Detener" else "Iniciar")
+                                Text(if (uiState.monitoring) "Stop" else "Start")
                             }
                         }
 
@@ -249,7 +258,7 @@ fun ActiveDiagnosticScreen(
 
                         if (uiState.latencyHistory.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Latencia (ms)", style = MaterialTheme.typography.labelMedium)
+                            Text("Latency (ms)", style = MaterialTheme.typography.labelMedium)
                             MiniLineChart(
                                 data = uiState.latencyHistory.map { it.toFloat() },
                                 color = SignalFair,
@@ -266,10 +275,10 @@ fun ActiveDiagnosticScreen(
     if (uiState.showProjectPicker) {
         AlertDialog(
             onDismissRequest = { viewModel.hideProjectPicker() },
-            title = { Text("Seleccionar proyecto") },
+            title = { Text("Select project") },
             text = {
                 if (uiState.projects.isEmpty()) {
-                    Text("No hay proyectos. Crea uno desde la pantalla de inicio.")
+                    Text("No projects. Create one from the home screen.")
                 } else {
                     Column {
                         uiState.projects.forEach { project ->
@@ -294,10 +303,10 @@ fun ActiveDiagnosticScreen(
                         viewModel.showSnapshotDialog()
                     },
                     enabled = uiState.selectedProjectId != null
-                ) { Text("Continuar") }
+                ) { Text("Continue") }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.hideProjectPicker() }) { Text("Cancelar") }
+                TextButton(onClick = { viewModel.hideProjectPicker() }) { Text("Cancel") }
             }
         )
     }

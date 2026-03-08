@@ -1,6 +1,7 @@
 package com.wifield.app.ui.screens.home
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,8 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.wifield.app.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wifield.app.data.local.entity.ProjectEntity
@@ -31,13 +34,23 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text("WiField", fontWeight = FontWeight.Bold)
-                        Text(
-                            "Site Survey WiFi",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.gauss_logo),
+                            contentDescription = "Gauss Logo",
+                            modifier = Modifier.size(40.dp)
                         )
+                        Column {
+                            Text("Gauss", fontWeight = FontWeight.Bold)
+                            Text(
+                                "Site Survey WiFi",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -50,7 +63,7 @@ fun HomeScreen(
                 onClick = { viewModel.showCreateDialog() },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nuevo proyecto")
+                Icon(Icons.Default.Add, contentDescription = "New project")
             }
         }
     ) { paddingValues ->
@@ -75,13 +88,13 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No hay proyectos",
+                        text = "No projects",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Crea un proyecto para comenzar tu auditoría WiFi",
+                        text = "Create a project to start your WiFi audit",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                     )
@@ -116,7 +129,7 @@ fun HomeScreen(
         ProjectDialog(
             onDismiss = { viewModel.hideEditDialog() },
             onSave = { name, desc -> viewModel.updateProject(uiState.editingProject!!, name, desc) },
-            title = "Editar Proyecto",
+            title = "Edit Project",
             initialName = uiState.editingProject!!.name,
             initialDescription = uiState.editingProject!!.description
         )
@@ -173,14 +186,14 @@ private fun ProjectCard(
 
                 Box {
                     IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Opciones")
+                        Icon(Icons.Default.MoreVert, contentDescription = "Options")
                     }
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Editar") },
+                            text = { Text("Edit") },
                             onClick = {
                                 showMenu = false
                                 onEdit()
@@ -188,7 +201,7 @@ private fun ProjectCard(
                             leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
+                            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
                             onClick = {
                                 showMenu = false
                                 showDeleteConfirm = true
@@ -205,7 +218,7 @@ private fun ProjectCard(
 
             val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()) }
             Text(
-                text = "Creado: ${dateFormat.format(Date(project.createdAt))}",
+                text = "Created: ${dateFormat.format(Date(project.createdAt))}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
             )
@@ -215,8 +228,8 @@ private fun ProjectCard(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Eliminar proyecto") },
-            text = { Text("¿Estás seguro de que quieres eliminar '${project.name}'? Se eliminarán todos los snapshots asociados.") },
+            title = { Text("Delete project") },
+            text = { Text("Are you sure you want to delete '${project.name}'? All associated snapshots will be deleted.") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -225,12 +238,12 @@ private fun ProjectCard(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Eliminar")
+                    Text("Delete")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text("Cancelar")
+                    Text("Cancel")
                 }
             }
         )

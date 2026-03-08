@@ -1,6 +1,8 @@
 package com.wifield.app
 
+import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,23 +45,30 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private fun hasLocationPermission(context: android.content.Context): Boolean {
+    val fineLocation = ContextCompat.checkSelfPermission(
+        context, Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val nearbyWifi = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.NEARBY_WIFI_DEVICES
+        ) == PackageManager.PERMISSION_GRANTED
+        return fineLocation || nearbyWifi
+    }
+    return fineLocation
+}
+
 @Composable
 fun WiFieldApp() {
-    var hasPermissions by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var hasPermissions by remember { mutableStateOf(hasLocationPermission(context)) }
     val requiredPermissions = remember { getRequiredPermissions() }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        hasPermissions = permissions.values.any { it }
-    }
-
-    // Check permissions on launch
-    val context = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) {
-        hasPermissions = requiredPermissions.any { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
+    ) { _ ->
+        hasPermissions = hasLocationPermission(context)
     }
 
     if (!hasPermissions) {

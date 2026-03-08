@@ -48,7 +48,7 @@ fun PermissionRequestScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Permisos necesarios",
+            text = "Required Permissions",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -56,7 +56,7 @@ fun PermissionRequestScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "WiField necesita los siguientes permisos para funcionar correctamente:",
+            text = "Gauss needs the following permissions to work correctly:",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
@@ -66,8 +66,8 @@ fun PermissionRequestScreen(
 
         PermissionItem(
             icon = Icons.Default.LocationOn,
-            title = "Ubicación",
-            description = "Necesario para escanear redes WiFi cercanas (requerido por Android)."
+            title = "Location",
+            description = "Required to scan nearby WiFi networks (required by Android)."
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -75,15 +75,15 @@ fun PermissionRequestScreen(
         PermissionItem(
             icon = Icons.Default.Wifi,
             title = "WiFi",
-            description = "Para acceder al estado WiFi, realizar escaneos y obtener información de la conexión actual."
+            description = "To access WiFi state, perform scans, and obtain current connection information."
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Spacer(modifier = Modifier.height(12.dp))
             PermissionItem(
                 icon = Icons.Default.Wifi,
-                title = "Dispositivos WiFi cercanos",
-                description = "Permiso requerido en Android 13+ para detectar redes WiFi."
+                title = "Nearby WiFi Devices",
+                description = "Permission required on Android 13+ to detect WiFi networks."
             )
         }
 
@@ -93,7 +93,7 @@ fun PermissionRequestScreen(
             onClick = onRequestPermissions,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Conceder permisos")
+            Text("Grant Permissions")
         }
     }
 }

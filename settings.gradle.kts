@@ -21,3 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "WiField"
 include(":app")
+
+// Redirect build dirs to local filesystem to avoid vmhgfs-fuse 255-char filename limit
+gradle.beforeProject {
+    layout.buildDirectory.set(File("/tmp/wifield-build/${project.name}"))
+}

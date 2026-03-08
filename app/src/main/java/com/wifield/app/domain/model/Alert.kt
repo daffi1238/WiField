@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 enum class AlertSeverity(val label: String, val color: Color) {
     INFO("Info", Color(0xFF2196F3)),
     WARNING("Warning", Color(0xFFFFC107)),
-    CRITICAL("Crítico", Color(0xFFF44336))
+    CRITICAL("Critical", Color(0xFFF44336))
 }
 
 enum class AlertType {

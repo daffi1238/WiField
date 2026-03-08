@@ -7,15 +7,20 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.wifield.app.domain.model.ScannedAccessPoint
 import com.wifield.app.domain.model.WifiBand
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+
+private const val TAG = "WifiScanner"
+private const val PLACEHOLDER_BSSID = "02:00:00:00:00:00"
 
 class WifiScanner(private val context: Context) {
 
@@ -94,48 +99,72 @@ class WifiScanner(private val context: Context) {
     }
 
     fun getConnectedBssid(): String? {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                val network = cm.activeNetwork
-                val capabilities = network?.let { cm.getNetworkCapabilities(it) }
-                val wifiInfo = capabilities?.transportInfo as? WifiInfo
-                wifiInfo?.bssid
-            } else {
-                @Suppress("DEPRECATION")
-                val wifiInfo = wifiManager.connectionInfo
-                @Suppress("DEPRECATION")
-                if (wifiInfo.networkId != -1) wifiInfo.bssid else null
-            }
-        } catch (e: Exception) {
-            null
+        return getWifiInfo()?.let { info ->
+            val bssid = info.bssid
+            if (isValidBssid(bssid)) bssid else null
         }
     }
 
-    @Suppress("DEPRECATION")
     fun getConnectionInfo(): ConnectionInfo? {
-        return try {
-            val wifiInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val wifiInfo = getWifiInfo() ?: return null
+        val bssid = wifiInfo.bssid
+        if (!isValidBssid(bssid)) return null
+
+        @Suppress("DEPRECATION")
+        return ConnectionInfo(
+            ssid = wifiInfo.ssid?.removePrefix("\"")?.removeSuffix("\"").orEmpty(),
+            bssid = bssid,
+            rssi = wifiInfo.rssi,
+            linkSpeed = wifiInfo.linkSpeed,
+            frequency = wifiInfo.frequency
+        )
+    }
+
+    /**
+     * Gets WifiInfo using multiple strategies for compatibility across Android versions.
+     * Strategy 1: ConnectivityManager (Android 12+, preferred)
+     * Strategy 2: WifiManager.connectionInfo (deprecated but works on all versions)
+     */
+    @Suppress("DEPRECATION", "MissingPermission")
+    private fun getWifiInfo(): WifiInfo? {
+        // Strategy 1: ConnectivityManager (Android 12+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
                 val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                 val network = cm.activeNetwork
-                val capabilities = network?.let { cm.getNetworkCapabilities(it) }
-                capabilities?.transportInfo as? WifiInfo
-            } else {
-                wifiManager.connectionInfo
+                if (network != null) {
+                    val caps = cm.getNetworkCapabilities(network)
+                    if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        val info = caps.transportInfo as? WifiInfo
+                        if (info != null && isValidBssid(info.bssid)) {
+                            Log.d(TAG, "Got WifiInfo via ConnectivityManager: bssid=${info.bssid}")
+                            return info
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "ConnectivityManager strategy failed", e)
             }
-
-            if (wifiInfo == null || wifiInfo.networkId == -1) return null
-
-            ConnectionInfo(
-                ssid = wifiInfo.ssid?.removePrefix("\"")?.removeSuffix("\"").orEmpty(),
-                bssid = wifiInfo.bssid.orEmpty(),
-                rssi = wifiInfo.rssi,
-                linkSpeed = wifiInfo.linkSpeed,
-                frequency = wifiInfo.frequency
-            )
-        } catch (e: Exception) {
-            null
         }
+
+        // Strategy 2: WifiManager (works on all versions, deprecated on 12+)
+        try {
+            val info = wifiManager.connectionInfo
+            if (info != null && isValidBssid(info.bssid)) {
+                Log.d(TAG, "Got WifiInfo via WifiManager: bssid=${info.bssid}")
+                return info
+            }
+            Log.d(TAG, "WifiManager returned invalid info: bssid=${info?.bssid}")
+        } catch (e: Exception) {
+            Log.w(TAG, "WifiManager strategy failed", e)
+        }
+
+        Log.d(TAG, "No valid WifiInfo found from any strategy")
+        return null
+    }
+
+    private fun isValidBssid(bssid: String?): Boolean {
+        return bssid != null && bssid != PLACEHOLDER_BSSID && bssid.isNotEmpty()
     }
 
     private fun hasPermissions(): Boolean {

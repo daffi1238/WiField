@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 fun SnapshotDialog(
     onDismiss: () -> Unit,
     onSave: (label: String) -> Unit,
-    title: String = "Guardar Snapshot"
+    title: String = "Save Snapshot"
 ) {
     var label by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
@@ -21,7 +21,7 @@ fun SnapshotDialog(
         text = {
             Column {
                 Text(
-                    text = "Asigne un nombre a esta ubicación:",
+                    text = "Assign a name to this location:",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -31,12 +31,12 @@ fun SnapshotDialog(
                         label = it
                         isError = false
                     },
-                    label = { Text("Nombre de ubicación") },
-                    placeholder = { Text("Ej: Sala de reuniones, Pasillo planta 2...") },
+                    label = { Text("Location name") },
+                    placeholder = { Text("E.g.: Meeting room, 2nd floor hallway...") },
                     singleLine = true,
                     isError = isError,
                     supportingText = if (isError) {
-                        { Text("El nombre no puede estar vacío") }
+                        { Text("Name cannot be empty") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -52,12 +52,12 @@ fun SnapshotDialog(
                     }
                 }
             ) {
-                Text("Guardar")
+                Text("Save")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )
@@ -67,7 +67,7 @@ fun SnapshotDialog(
 fun ProjectDialog(
     onDismiss: () -> Unit,
     onSave: (name: String, description: String) -> Unit,
-    title: String = "Nuevo Proyecto",
+    title: String = "New Project",
     initialName: String = "",
     initialDescription: String = ""
 ) {
@@ -86,12 +86,12 @@ fun ProjectDialog(
                         name = it
                         isError = false
                     },
-                    label = { Text("Nombre del proyecto") },
-                    placeholder = { Text("Ej: Oficina Central, Almacén Norte...") },
+                    label = { Text("Project name") },
+                    placeholder = { Text("E.g.: Main Office, North Warehouse...") },
                     singleLine = true,
                     isError = isError,
                     supportingText = if (isError) {
-                        { Text("El nombre no puede estar vacío") }
+                        { Text("Name cannot be empty") }
                     } else null,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -99,8 +99,8 @@ fun ProjectDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Descripción (opcional)") },
-                    placeholder = { Text("Notas sobre el edificio o proyecto...") },
+                    label = { Text("Description (optional)") },
+                    placeholder = { Text("Notes about the building or project...") },
                     maxLines = 3,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -116,12 +116,12 @@ fun ProjectDialog(
                     }
                 }
             ) {
-                Text("Guardar")
+                Text("Save")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text("Cancel")
             }
         }
     )

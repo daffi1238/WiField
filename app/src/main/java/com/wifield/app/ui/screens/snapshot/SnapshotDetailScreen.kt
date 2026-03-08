@@ -54,7 +54,7 @@ fun SnapshotDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -78,10 +78,10 @@ fun SnapshotDetailScreen(
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         InfoChip(
-                            label = if (uiState.snapshot?.isActiveMode == true) "Modo Activo" else "Modo Pasivo",
+                            label = if (uiState.snapshot?.isActiveMode == true) "Active Mode" else "Passive Mode",
                             color = if (uiState.snapshot?.isActiveMode == true) SignalGood else MaterialTheme.colorScheme.secondary
                         )
-                        InfoChip(label = "${uiState.accessPoints.size} APs detectados")
+                        InfoChip(label = "${uiState.accessPoints.size} APs detected")
                     }
                 }
 
@@ -91,15 +91,15 @@ fun SnapshotDetailScreen(
                         val result = uiState.activeTestResult!!
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Resultados del diagnóstico", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text("Diagnostic results", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    MetricItem("Descarga", "${String.format("%.1f", result.downloadSpeed)} Mbps", SignalGood)
-                                    MetricItem("Subida", "${String.format("%.1f", result.uploadSpeed)} Mbps", SignalExcellent)
+                                    MetricItem("Download", "${String.format("%.1f", result.downloadSpeed)} Mbps", SignalGood)
+                                    MetricItem("Upload", "${String.format("%.1f", result.uploadSpeed)} Mbps", SignalExcellent)
                                     MetricItem("Link Speed", "${result.linkSpeed} Mbps", WiFieldSecondary)
                                 }
 
@@ -111,9 +111,9 @@ fun SnapshotDetailScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    MetricItem("Latencia", "${String.format("%.1f", result.latency)} ms", SignalFair)
+                                    MetricItem("Latency", "${String.format("%.1f", result.latency)} ms", SignalFair)
                                     MetricItem("Jitter", "${String.format("%.1f", result.jitter)} ms", SignalWeak)
-                                    MetricItem("Pérdida", "${String.format("%.1f", result.packetLoss)}%",
+                                    MetricItem("Loss", "${String.format("%.1f", result.packetLoss)}%",
                                         if (result.packetLoss > 5) SignalCritical else SignalExcellent)
                                     MetricItem("Gateway", "${String.format("%.1f", result.gatewayLatency)} ms", WiFieldSecondary)
                                 }
@@ -125,7 +125,7 @@ fun SnapshotDetailScreen(
                 // Alerts section
                 if (uiState.alerts.isNotEmpty()) {
                     item {
-                        Text("Alertas", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("Alerts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     }
                     items(uiState.alerts) { alert ->
                         AlertCard(alert = alert)
@@ -134,7 +134,7 @@ fun SnapshotDetailScreen(
 
                 // Channel distribution
                 item {
-                    Text("Distribución de canales", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Channel distribution", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 item {
                     ChannelChart(accessPoints = uiState.accessPoints, band = WifiBand.BAND_2_4_GHZ)

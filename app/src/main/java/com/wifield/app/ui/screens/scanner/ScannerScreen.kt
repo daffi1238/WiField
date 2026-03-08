@@ -39,7 +39,7 @@ fun ScannerScreen(
                         Text("Scanner WiFi", fontWeight = FontWeight.Bold)
                         if (uiState.lastScanTime > 0) {
                             Text(
-                                text = "${uiState.accessPoints.size} APs - Último: ${dateFormat.format(Date(uiState.lastScanTime))}",
+                                text = "${uiState.accessPoints.size} APs - Last: ${dateFormat.format(Date(uiState.lastScanTime))}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
@@ -55,7 +55,7 @@ fun ScannerScreen(
                         )
                     }
                     IconButton(onClick = { viewModel.triggerScan() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Escanear")
+                        Icon(Icons.Default.Refresh, contentDescription = "Scan")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -93,7 +93,7 @@ fun ScannerScreen(
                 Tab(
                     selected = uiState.selectedTab == ScannerTab.LIST,
                     onClick = { viewModel.selectTab(ScannerTab.LIST) },
-                    text = { Text("Lista") },
+                    text = { Text("List") },
                     icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 )
                 Tab(
@@ -105,7 +105,7 @@ fun ScannerScreen(
                 Tab(
                     selected = uiState.selectedTab == ScannerTab.CHANNELS,
                     onClick = { viewModel.selectTab(ScannerTab.CHANNELS) },
-                    text = { Text("Canales") },
+                    text = { Text("Channels") },
                     icon = { Icon(Icons.Default.BarChart, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 )
             }
@@ -126,7 +126,7 @@ fun ScannerScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "Escaneando redes...",
+                                    "Scanning networks...",
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
                             }
@@ -174,7 +174,7 @@ fun ScannerScreen(
                         // Alerts section
                         if (uiState.alerts.isNotEmpty()) {
                             Text(
-                                text = "Alertas",
+                                text = "Alerts",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -192,10 +192,10 @@ fun ScannerScreen(
     if (uiState.showProjectPicker) {
         AlertDialog(
             onDismissRequest = { viewModel.hideProjectPicker() },
-            title = { Text("Seleccionar proyecto") },
+            title = { Text("Select project") },
             text = {
                 if (uiState.projects.isEmpty()) {
-                    Text("No hay proyectos. Crea uno desde la pantalla de inicio.")
+                    Text("No projects. Create one from the home screen.")
                 } else {
                     Column {
                         uiState.projects.forEach { project ->
@@ -224,12 +224,12 @@ fun ScannerScreen(
                     },
                     enabled = uiState.selectedProjectId != null
                 ) {
-                    Text("Continuar")
+                    Text("Continue")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.hideProjectPicker() }) {
-                    Text("Cancelar")
+                    Text("Cancel")
                 }
             }
         )
@@ -264,7 +264,7 @@ fun SsidGroupCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = group.ssid.ifEmpty { "(Oculto)" },
+                        text = group.ssid.ifEmpty { "(Hidden)" },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -283,33 +283,41 @@ fun SsidGroupCard(
             }
 
             AnimatedVisibility(visible = expanded) {
-                Column(
-                    modifier = Modifier.padding(top = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    group.accessPoints.sortedByDescending { it.rssi }.forEach { ap ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column {
-                                Text(
-                                    text = ap.bssid,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Text("CH ${ap.channel}", style = MaterialTheme.typography.labelSmall)
-                                    Text("${ap.channelWidth}MHz", style = MaterialTheme.typography.labelSmall)
-                                    Text(ap.security, style = MaterialTheme.typography.labelSmall)
-                                }
-                            }
-                            SignalStrengthIndicator(rssi = ap.rssi)
-                        }
-                        if (ap != group.accessPoints.last()) {
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
-                        }
+                SsidGroupDetails(group)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SsidGroupDetails(group: com.wifield.app.domain.model.SsidGroup) {
+    val sortedAps = remember(group.accessPoints) {
+        group.accessPoints.sortedByDescending { it.rssi }
+    }
+    Column(
+        modifier = Modifier.padding(top = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        sortedAps.forEachIndexed { index, ap ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = ap.bssid,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("CH ${ap.channel}", style = MaterialTheme.typography.labelSmall)
+                        Text("${ap.channelWidth}MHz", style = MaterialTheme.typography.labelSmall)
+                        Text(ap.security, style = MaterialTheme.typography.labelSmall)
                     }
                 }
+                SignalStrengthIndicator(rssi = ap.rssi)
+            }
+            if (index < sortedAps.lastIndex) {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp))
             }
         }
     }

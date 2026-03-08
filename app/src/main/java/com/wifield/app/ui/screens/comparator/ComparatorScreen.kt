@@ -38,15 +38,15 @@ fun ComparatorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Comparador", fontWeight = FontWeight.Bold) },
+                title = { Text("Comparator", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.showPicker() }) {
-                        Icon(Icons.Default.Add, contentDescription = "Agregar snapshot")
+                        Icon(Icons.Default.Add, contentDescription = "Add snapshot")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -74,13 +74,13 @@ fun ComparatorScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "Selecciona snapshots para comparar",
+                        "Select snapshots to compare",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { viewModel.showPicker() }) {
-                        Text("Seleccionar")
+                        Text("Select")
                     }
                 }
             }
@@ -140,7 +140,7 @@ fun ComparatorScreen(
 
                 // Signal comparison
                 item {
-                    Text("Comparación de señal", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Signal comparison", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
                 item {
@@ -164,7 +164,7 @@ fun ComparatorScreen(
                 val activeComparisons = uiState.selectedSnapshots.filter { it.activeTestResult != null }
                 if (activeComparisons.isNotEmpty()) {
                     item {
-                        Text("Comparación de rendimiento", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("Performance comparison", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     }
 
                     item {
@@ -172,7 +172,7 @@ fun ComparatorScreen(
                             Column(modifier = Modifier.padding(16.dp)) {
                                 // Table header
                                 Row(modifier = Modifier.fillMaxWidth()) {
-                                    Text("Ubicación", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                    Text("Location", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                                     Text("Down", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                                     Text("Up", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                                     Text("Ping", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
@@ -197,7 +197,7 @@ fun ComparatorScreen(
 
                 // Common SSIDs across snapshots
                 item {
-                    Text("SSIDs comunes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("Common SSIDs", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
                 val allSsids = uiState.selectedSnapshots.flatMap { it.accessPoints.map { ap -> ap.ssid } }.distinct().sorted()
@@ -238,7 +238,7 @@ fun ComparatorScreen(
                                             )
                                         } else {
                                             Text(
-                                                text = "N/D",
+                                                text = "N/A",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                             )
@@ -257,11 +257,11 @@ fun ComparatorScreen(
     if (uiState.showPicker) {
         AlertDialog(
             onDismissRequest = { viewModel.hidePicker() },
-            title = { Text("Seleccionar snapshots") },
+            title = { Text("Select snapshots") },
             text = {
                 Column {
                     Text(
-                        "Selecciona los snapshots que quieres comparar:",
+                        "Select the snapshots you want to compare:",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
@@ -279,7 +279,7 @@ fun ComparatorScreen(
                             Column(modifier = Modifier.padding(start = 8.dp)) {
                                 Text(text = snapshot.label, style = MaterialTheme.typography.bodyMedium)
                                 Text(
-                                    text = if (snapshot.isActiveMode) "Modo activo" else "Modo pasivo",
+                                    text = if (snapshot.isActiveMode) "Active mode" else "Passive mode",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                                 )
@@ -290,7 +290,7 @@ fun ComparatorScreen(
             },
             confirmButton = {
                 Button(onClick = { viewModel.hidePicker() }) {
-                    Text("Listo")
+                    Text("Done")
                 }
             }
         )

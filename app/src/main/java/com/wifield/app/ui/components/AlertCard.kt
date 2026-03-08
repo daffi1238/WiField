@@ -54,7 +54,7 @@ fun AlertCard(
                 }
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (expanded) "Colapsar" else "Expandir",
+                    contentDescription = if (expanded) "Collapse" else "Expand",
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
@@ -76,7 +76,7 @@ fun AlertCard(
                             verticalAlignment = Alignment.Top
                         ) {
                             Text(
-                                text = "Recomendación: ",
+                                text = "Recommendation: ",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -109,7 +109,7 @@ fun AlertSummary(
     ) {
         if (criticalCount > 0) {
             InfoChip(
-                label = "$criticalCount Crítico${if (criticalCount > 1) "s" else ""}",
+                label = "$criticalCount Critical",
                 color = com.wifield.app.ui.theme.AlertCritical
             )
         }
@@ -127,7 +127,7 @@ fun AlertSummary(
         }
         if (alerts.isEmpty()) {
             InfoChip(
-                label = "Sin alertas",
+                label = "No alerts",
                 color = com.wifield.app.ui.theme.SignalExcellent
             )
         }
