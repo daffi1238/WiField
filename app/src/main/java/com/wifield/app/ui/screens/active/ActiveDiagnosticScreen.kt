@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -252,16 +253,18 @@ fun ActiveDiagnosticScreen(
                             MiniLineChart(
                                 data = uiState.rssiHistory.map { it.toFloat() },
                                 color = SignalGood,
+                                unit = "dBm",
                                 modifier = Modifier.fillMaxWidth().height(80.dp)
                             )
                         }
 
                         if (uiState.latencyHistory.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Latency (ms)", style = MaterialTheme.typography.labelMedium)
+                            Text("Latency", style = MaterialTheme.typography.labelMedium)
                             MiniLineChart(
                                 data = uiState.latencyHistory.map { it.toFloat() },
                                 color = SignalFair,
+                                unit = "ms",
                                 modifier = Modifier.fillMaxWidth().height(80.dp)
                             )
                         }
@@ -346,20 +349,61 @@ private fun PingMetric(label: String, value: String) {
 fun MiniLineChart(
     data: List<Float>,
     color: Color,
+    unit: String = "",
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) return
+
+    val labelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 
     Canvas(modifier = modifier) {
         val maxVal = data.max()
         val minVal = data.min()
         val range = (maxVal - minVal).coerceAtLeast(1f)
-        val stepX = size.width / (data.size - 1).coerceAtLeast(1)
+        val midVal = (maxVal + minVal) / 2f
+
+        val textPaint = android.graphics.Paint().apply {
+            this.color = labelColor.hashCode()
+            textSize = 24f
+            isAntiAlias = true
+        }
+
+        // Measure label width to offset the chart area
+        val maxLabel = "${maxVal.toInt()} $unit"
+        val labelWidth = textPaint.measureText(maxLabel) + 8f
+
+        val chartLeft = labelWidth
+        val chartWidth = size.width - chartLeft
         val padding = 4f
 
+        // Draw Y-axis labels (max, mid, min)
+        val labels = listOf(
+            maxVal to padding + textPaint.textSize * 0.4f,
+            midVal to size.height / 2f + textPaint.textSize * 0.35f,
+            minVal to size.height - padding
+        )
+        for ((value, yPos) in labels) {
+            val fmt = if (value == value.toLong().toFloat()) "${value.toInt()} $unit"
+                      else "${String.format("%.1f", value)} $unit"
+            drawContext.canvas.nativeCanvas.drawText(fmt, 0f, yPos, textPaint)
+        }
+
+        // Draw horizontal grid lines
+        val gridYPositions = listOf(padding, size.height / 2f, size.height - padding)
+        for (gy in gridYPositions) {
+            drawLine(
+                color = labelColor.copy(alpha = 0.2f),
+                start = Offset(chartLeft, gy),
+                end = Offset(size.width, gy),
+                strokeWidth = 1f
+            )
+        }
+
+        // Draw data line
+        val stepX = chartWidth / (data.size - 1).coerceAtLeast(1)
         val path = Path()
         data.forEachIndexed { index, value ->
-            val x = index * stepX
+            val x = chartLeft + index * stepX
             val y = size.height - padding - ((value - minVal) / range) * (size.height - 2 * padding)
             if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
         }
@@ -370,9 +414,9 @@ fun MiniLineChart(
             style = Stroke(width = 2f, cap = StrokeCap.Round)
         )
 
-        // Draw dots on last point
+        // Draw dot on last point
         if (data.isNotEmpty()) {
-            val lastX = (data.size - 1) * stepX
+            val lastX = chartLeft + (data.size - 1) * stepX
             val lastY = size.height - padding - ((data.last() - minVal) / range) * (size.height - 2 * padding)
             drawCircle(color = color, radius = 4f, center = Offset(lastX, lastY))
         }
